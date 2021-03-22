@@ -12,7 +12,8 @@ namespace ScrapeHtmlAgilityPack
             HtmlWeb web = new HtmlWeb();
             HtmlDocument document = web.Load("http://www.c-sharpcorner.com");
             HtmlNode[] nodes = document.DocumentNode.SelectNodes("//a[contains(@class, 'title')]").ToArray();
-            var csvFile = new StreamWriter("C:/Users/karol/OneDrive/Desktop/output/Sample.csv");
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory) + "output/Sample.csv";
+            var csvFile = new StreamWriter(path);
             csvFile.Write("column" + ",");
             foreach (HtmlNode item in nodes)
             {
