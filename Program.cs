@@ -5,12 +5,14 @@ using HtmlAgilityPack;
 
 namespace ScrapeHtmlAgilityPack
 {
-    class Program
+    public class Program
     {
+        public static string URL = "http://www.c-sharpcorner.com";
+
         static void Main(string[] args)
         {
             HtmlWeb web = new HtmlWeb();
-            HtmlDocument document = web.Load("http://www.c-sharpcorner.com");
+            HtmlDocument document = web.Load(URL);
             HtmlNode[] nodes = document.DocumentNode.SelectNodes("//a[contains(@class, 'title')]").ToArray();
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory) + "output/Sample.csv";
             var csvFile = new StreamWriter(path);
