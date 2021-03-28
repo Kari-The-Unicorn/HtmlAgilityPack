@@ -13,28 +13,25 @@ namespace ScrapeHtmlAgilityPack
     {
         public static string URL = "http://www.c-sharpcorner.com";
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             HtmlWeb web = new HtmlWeb();
             HtmlDocument document = web.Load(URL);
-            HtmlNode eventsMain = document.DocumentNode.SelectNodes("//div[contains(@class,'Events')]").First();
-            HtmlNode[] events = eventsMain.SelectNodes(".//li").ToArray();
+            HtmlNode[] events = document.DocumentNode.SelectNodes("//div[contains(@class,'Events')]//li").ToArray();
+            string eventTitle = string.Empty;
+            string registrLink = string.Empty;
+
             foreach (var evnt in events)
             {
-                HtmlNode[] dateTimeDetails = evnt.SelectNodes("//span[contains(@class, 'timeEvent')]").ToArray();
-                foreach (var info in dateTimeDetails)
-                {
-                    string month = info.SelectSingleNode("//span[contains(@class, 'LocalMonth1')]").InnerText;
-                    string day = info.SelectSingleNode("//span[contains(@class, 'LocalDay1')]").InnerText;
-                    string time = info.SelectSingleNode("//span[contains(@class, 'LocalTime1')]").InnerText;
-                    string dateTime = day + " " + month + " " + time;
-                    
-
-
-                }
+                HtmlNode eventsDetails = evnt.SelectSingleNode("//div[contains(@class, 'eventsWrap')]");
+                eventTitle = eventsDetails.SelectSingleNode("//a[contains(@class,'title')]").InnerText;
+                registrLink = eventsDetails.SelectSingleNode("//a[contains(@class,'rgstr')]")
+                    .GetAttributeValue("href", null);
+                WriteToCsv(eventTitle, registrLink);
             }
         }
-        private void WriteToCsv(string dateTime, string subject, string registerDetails)
+
+        private static void WriteToCsv(string subject, string registerDetails)
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory) + "output/Sample.csv";
             using (var writer = new StreamWriter(path))
@@ -43,9 +40,8 @@ namespace ScrapeHtmlAgilityPack
                 var records = new List<Header>();
                 records.Add(new Header
                 {
-                    DateTime = dateTime,
                     Subject = subject,
-                    RegisterDetails = registerDetails,
+                    RegisterLink = registerDetails,
                 });
                 csvWriter.WriteRecords(records);
             }
